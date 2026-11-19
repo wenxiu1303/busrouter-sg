@@ -1341,6 +1341,9 @@ const App = () => {
     );
     map.addControl(
       new GeolocateControl({
+        // Fork: opening the app at home centres on you to show nearby stops;
+        // links to a specific stop/service/route still open there.
+        autoLocate: () => getRoute().page === 'home',
         offset: () => {
           if (!BREAKPOINT()) {
             if (stopPopover.current?.classList.contains('expand')) {

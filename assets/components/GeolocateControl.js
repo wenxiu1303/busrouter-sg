@@ -16,6 +16,10 @@ export default class GeolocateControl {
       {
         offset: [0, 0],
         onClick: () => {},
+        // Fork: return true to centre on the user as soon as the map opens
+        // (asks for permission if not yet granted). Called once at setup.
+        autoLocate: () => false,
+        autoLocateZoom: 17,
       },
       options,
     );
@@ -66,7 +70,11 @@ export default class GeolocateControl {
 
     this._setup = true;
 
-    if (supported === 'granted') this._clickButton(null, false);
+    if (supported !== false && this.options.autoLocate()) {
+      this._initialZoom = this.options.autoLocateZoom;
+      this._autoOnce = true;
+      this._clickButton(null, true);
+    } else if (supported === 'granted') this._clickButton(null, false);
   };
   _updateButtonState = (state) => {
     const { classList } = this._button;
@@ -78,6 +86,15 @@ export default class GeolocateControl {
     const map = this._map;
     const { _currentLocation: center } = this;
     const { offset: _offset } = this.options;
+    // Fork: the first auto-centre uses a wider zoom so nearby stops are visible.
+    const zoom = this._initialZoom || 18;
+    this._initialZoom = null;
+    if (this._autoOnce) {
+      // Auto-centre on open happens once; don't keep following the user.
+      this._autoOnce = false;
+      this._locking = false;
+      this._updateButtonState(null);
+    }
     const offset = typeof _offset === 'function' ? _offset() : _offset;
     const { x, y } = map.project(center);
     const { offsetWidth, offsetHeight, offsetLeft, offsetTop } =
@@ -97,7 +114,7 @@ export default class GeolocateControl {
         map.easeTo(
           {
             center,
-            zoom: 18,
+            zoom,
             duration: 300,
             offset,
             animate: false,
@@ -108,7 +125,7 @@ export default class GeolocateControl {
         map.flyTo(
           {
             center,
-            zoom: 18,
+            zoom,
             speed: 1.5,
             duration: 2000,
             offset,
@@ -120,7 +137,7 @@ export default class GeolocateControl {
       map.easeTo(
         {
           center,
-          zoom: 18,
+          zoom,
           duration: 300,
           offset,
           animate: false,
