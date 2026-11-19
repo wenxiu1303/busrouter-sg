@@ -587,7 +587,44 @@ footer {
   z-index: 2;
 }
 .stop-map-marker.opposite {
-  background-color: #3367d6;
+  background-color: #7b3fbf; /* purple: blue is reserved for "you are here" */
+}
+.stop-map-marker.me {
+  width: 16px;
+  height: 16px;
+  padding: 0;
+  background-color: #1a73e8;
+  box-shadow: 0 0 0 6px rgba(26, 115, 232, 0.25), 0 1px 3px rgba(0, 0, 0, 0.4);
+  z-index: 3;
+}
+.stop-map {
+  position: relative;
+}
+.stop-map-locate {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  z-index: 5;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+  font-size: 12px;
+}
+.stop-map-locate button,
+.stop-map-locate span {
+  font: inherit;
+  background: #fff;
+  border: 0;
+  border-radius: 6px;
+  padding: 5px 8px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+.stop-map-locate button {
+  cursor: pointer;
+}
+.stop-map-locate .error {
+  color: #b3261e;
 }
 @media (min-width: 720px) {
   /* Must come after the base .stop-map rule above to win the cascade. */
