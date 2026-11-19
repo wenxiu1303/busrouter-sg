@@ -12,6 +12,7 @@ import setIcon from '../utils/setIcon';
 import ArrivalTimeText from './components/ArrivalTimeText';
 import LocaleSelector from './components/LocaleSelector';
 import OtherSide from './components/OtherSide';
+import StopMap from './components/StopMap';
 import { buildOppositeIndex } from './utils/otherSide';
 
 import wheelchairImagePath from './images/wheelchair.svg';
@@ -307,6 +308,15 @@ function ArrivalTimes() {
   }
 
   const { code, name, lat, lng } = busStop;
+  const oppositeMatch = oppositeIndex?.get(code);
+  const oppositeStop =
+    oppositeMatch && stopsData?.[oppositeMatch.code]
+      ? {
+          code: oppositeMatch.code,
+          lng: stopsData[oppositeMatch.code][0],
+          lat: stopsData[oppositeMatch.code][1],
+        }
+      : null;
   if (services) services.sort(sortServicesPinned(pinnedServices));
 
   const hasMultipleVisits = services?.some((service) => {
@@ -320,8 +330,9 @@ function ArrivalTimes() {
 
   return (
     <div>
-      {/* Static map image removed in this fork: it was served through the
-          original author's Mapbox-backed worker. Link to our own map instead. */}
+      {/* Upstream's static map image used the author's Mapbox-backed worker;
+          this fork renders its own small MapLibre map instead. */}
+      <StopMap stop={busStop} opposite={oppositeStop} />
       <h1>
         {t('arrivals.preHeading')}
         <b id="bus-stop-name">
