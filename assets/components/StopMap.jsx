@@ -1,4 +1,4 @@
-import { h } from 'preact';
+import { h, Fragment } from 'preact';
 import { useEffect, useRef, useState } from 'preact/hooks';
 
 // Small map for the arrival page, replacing upstream's Mapbox static image.
@@ -192,6 +192,16 @@ export default function StopMap({ stop, opposite }) {
 
   const near = position && distanceMeters(position, stop) <= NEAR_METERS;
 
+  // Which side am I on? Compare distance to this stop vs the opposite stop.
+  // If the difference is smaller than the GPS error, don't pretend to know.
+  let side = null; // 'here' | 'opposite' | 'unsure'
+  if (near && opposite) {
+    const dHere = distanceMeters(position, stop);
+    const dOpp = distanceMeters(position, opposite);
+    if (Math.abs(dHere - dOpp) < position.accuracy) side = 'unsure';
+    else side = dHere < dOpp ? 'here' : 'opposite';
+  }
+
   return (
     <div class="stop-map" ref={containerRef}>
       <div class="stop-map-locate">
@@ -200,10 +210,23 @@ export default function StopMap({ stop, opposite }) {
             📍 Show me
           </button>
         ) : position ? (
-          <span>
-            {near
-              ? `You: ±${Math.round(position.accuracy)} m`
-              : `You're ${(distanceMeters(position, stop) / 1000).toFixed(1)} km away`}
+          <span class={`side-hint ${side || ''}`}>
+            {!near ? (
+              `You're ${(distanceMeters(position, stop) / 1000).toFixed(1)} km away`
+            ) : side === 'here' ? (
+              <>✓ You're on this stop's side</>
+            ) : side === 'opposite' ? (
+              <>
+                You're nearer{' '}
+                <a href={`#${opposite.code}`}>
+                  {opposite.name} ({opposite.code}) → see its buses
+                </a>
+              </>
+            ) : side === 'unsure' ? (
+              `Can't tell which side (GPS ±${Math.round(position.accuracy)} m)`
+            ) : (
+              `You: ±${Math.round(position.accuracy)} m`
+            )}
           </span>
         ) : (
           <span>Locating…</span>

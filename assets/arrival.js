@@ -315,6 +315,7 @@ function ArrivalTimes() {
           code: oppositeMatch.code,
           lng: stopsData[oppositeMatch.code][0],
           lat: stopsData[oppositeMatch.code][1],
+          name: stopsData[oppositeMatch.code][2],
         }
       : null;
   if (services) services.sort(sortServicesPinned(pinnedServices));

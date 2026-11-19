@@ -634,3 +634,18 @@ footer {
     height: min(70vh, 560px);
   }
 }
+.stop-map-locate .side-hint {
+  max-width: 220px;
+  text-align: right;
+}
+.stop-map-locate .side-hint.here {
+  color: #3a6727;
+}
+.stop-map-locate .side-hint.opposite {
+  background: #7b3fbf;
+  color: #fff;
+}
+.stop-map-locate .side-hint.opposite a {
+  color: #fff;
+  font-weight: bold;
+}
