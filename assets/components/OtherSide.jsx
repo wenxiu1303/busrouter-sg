@@ -5,14 +5,21 @@ import { servicesAtStop, isRightSide } from '../utils/otherSide';
 
 const stopLabel = (stops, code) => `${stops[code]?.[2] || code} (${code})`;
 
-function OppositeLink({ stops, opposite }) {
+const stopName = (stops, code) => stops[code]?.[2] || code;
+
+// Tappable card that jumps to the stop across the road.
+function OppositeCard({ stops, opposite }) {
   if (!opposite) return null;
   return (
-    <p class="other-side">
-      Other side:{' '}
-      <a href={`#${opposite.code}`}>{stopLabel(stops, opposite.code)}</a>{' '}
-      · {Math.round(opposite.meters)} m
-    </p>
+    <a class="os-card" href={`#${opposite.code}`}>
+      <span class="os-kicker">Other side of the road</span>
+      <span class="os-main">
+        <span class="os-chip">{opposite.code}</span>
+        <span class="os-name">{stopName(stops, opposite.code)}</span>
+      </span>
+      <span class="os-meta">{Math.round(opposite.meters)} m away</span>
+      <span class="os-chevron" aria-hidden="true">›</span>
+    </a>
   );
 }
 
@@ -38,48 +45,55 @@ function SideCheck({ stops, services, code, opposite }) {
 
   return (
     <form class="side-check" onSubmit={(e) => e.preventDefault()}>
-      <label>
-        Bus{' '}
-        <select value={svc} onInput={(e) => setSvc(e.target.value)}>
-          <option value="">–</option>
-          {options.map((s) => (
-            <option value={s}>{s}</option>
-          ))}
-        </select>
-      </label>{' '}
-      <label>
-        to{' '}
-        <input
-          list="side-check-destinations"
-          placeholder="Destination stop"
-          value={destInput}
-          disabled={!svc}
-          onInput={(e) => setDestInput(e.target.value)}
-        />
-      </label>
+      <div class="sc-title">Am I on the right side?</div>
+      <div class="sc-row">
+        <label class="sc-select">
+          <span class="sr-only">Bus</span>
+          <select value={svc} onInput={(e) => setSvc(e.target.value)}>
+            <option value="">Bus</option>
+            {options.map((s) => (
+              <option value={s}>{s}</option>
+            ))}
+          </select>
+        </label>
+        <label class="sc-input">
+          <span class="sr-only">Destination stop</span>
+          <input
+            list="side-check-destinations"
+            placeholder={svc ? 'Where are you going?' : 'Pick a bus first'}
+            value={destInput}
+            disabled={!svc}
+            onInput={(e) => setDestInput(e.target.value)}
+          />
+        </label>
+      </div>
       <datalist id="side-check-destinations">
         {destinations.map((d) => (
           <option value={stopLabel(stops, d)} />
         ))}
       </datalist>
-      {result === 'right' && <p class="side-result right">✅ Right side</p>}
+      {result === 'right' && (
+        <p class="side-result right">✓ You're on the right side</p>
+      )}
       {result === 'wrong' && (
         <p class="side-result wrong">
-          ❌ Wrong side
+          ✕ Wrong side
           {opposite ? (
             <>
-              , cross to{' '}
-              <a href={`#${opposite.code}`}>{stopLabel(stops, opposite.code)}</a>{' '}
-              ({Math.round(opposite.meters)} m)
+              {' '}— cross to{' '}
+              <a href={`#${opposite.code}`}>
+                {stopName(stops, opposite.code)} ({opposite.code})
+              </a>
+              , {Math.round(opposite.meters)} m
             </>
           ) : (
-            ': board on the other side of the road'
+            ' — board on the other side of the road'
           )}
         </p>
       )}
       {result === 'unknown' && (
         <p class="side-result unknown">
-          Can't tell: bus {svc} may not serve that stop.
+          Can't tell — bus {svc} may not stop there.
         </p>
       )}
     </form>
@@ -91,10 +105,7 @@ export default function OtherSide({ stops, services, oppositeIndex, code }) {
   const opposite = oppositeIndex.get(code);
   return (
     <div class="other-side-box">
-      <p>
-        <a href={`../#/stops/${code}`}>Show on map →</a>
-      </p>
-      <OppositeLink stops={stops} opposite={opposite} />
+      <OppositeCard stops={stops} opposite={opposite} />
       <SideCheck
         key={code}
         stops={stops}
@@ -102,6 +113,9 @@ export default function OtherSide({ stops, services, oppositeIndex, code }) {
         code={code}
         opposite={opposite}
       />
+      <a class="os-map-link" href={`../#/stops/${code}`}>
+        View on full map
+      </a>
     </div>
   );
 }
