@@ -540,3 +540,25 @@ footer {
   color: #3a6727;
   background: linear-gradient(90deg, #5d33 0%, #fff0 100%);
 }
+/* Other Side: opposite-stop link + side check */
+.other-side-box {
+  margin: 0 0 12px;
+  font-size: 0.9em;
+}
+.other-side-box p {
+  margin: 4px 0;
+}
+.side-check select,
+.side-check input {
+  font: inherit;
+  max-width: 60vw;
+}
+.side-result.right {
+  color: #3a6727;
+}
+.side-result.wrong {
+  color: #b3261e;
+}
+.side-result.unknown {
+  opacity: 0.7;
+}

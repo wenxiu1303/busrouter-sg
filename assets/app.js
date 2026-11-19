@@ -2940,7 +2940,7 @@ const App = () => {
                 })}{' '}
                 ∙{' '}
                 <a
-                  href={`/bus-first-last/#${stopPopoverData.number}`}
+                  href={`bus-first-last/#${stopPopoverData.number}`}
                   target="_blank"
                 >
                   {t('stop.firstLastBus')}{' '}
@@ -2964,7 +2964,7 @@ const App = () => {
             <div class="popover-footer">
               <div class="popover-buttons alt-hide">
                 <a
-                  href={`/bus-arrival/#${stopPopoverData.number}`}
+                  href={`bus-arrival/#${stopPopoverData.number}`}
                   target="_blank"
                   onClick={openBusArrival}
                   class="popover-button primary"
@@ -3162,7 +3162,7 @@ const App = () => {
             &times;
           </a>,
           <a
-            href={`/bus-arrival/#${showArrivalsPopover.number}`}
+            href={`bus-arrival/#${showArrivalsPopover.number}`}
             target="_blank"
             onClick={(e) => {
               openBusArrival(e, true);

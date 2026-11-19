@@ -11,6 +11,8 @@ import setIcon from '../utils/setIcon';
 
 import ArrivalTimeText from './components/ArrivalTimeText';
 import LocaleSelector from './components/LocaleSelector';
+import OtherSide from './components/OtherSide';
+import { buildOppositeIndex } from './utils/otherSide';
 
 import wheelchairImagePath from './images/wheelchair.svg';
 import wheelchairInaccessibleImagePath from './images/wheelchair-inaccessible.svg';
@@ -20,6 +22,7 @@ import busBendyImagePath from './images/bus-bendy.svg';
 
 const dataPath = 'https://data.busrouter.sg/v1/';
 const stopsJSONPath = dataPath + 'stops.min.json';
+const servicesJSONPath = dataPath + 'services.min.json';
 
 const BUSES = {
   sd: {
@@ -182,6 +185,8 @@ function ArrivalTimes() {
   const { t, i18n } = useTranslation();
   const [busStop, setBusStop] = useState(null);
   const [stopsData, setStopsData] = useState(null);
+  const [servicesData, setServicesData] = useState(null);
+  const [oppositeIndex, setOppositeIndex] = useState(null);
   const [fetchServicesStatus, setFetchServicesStatus] = useState(null); // 'loading', 'error', 'online'
   const [services, setServices] = useState(null);
   const initialPinnedServices =
@@ -209,6 +214,16 @@ function ArrivalTimes() {
     };
     window.onhashchange();
     setStopsData(stops);
+
+    // Other Side: services data powers the opposite-stop link and side check.
+    // Loaded after stops so arrival times aren't delayed by it.
+    try {
+      const svcs = await fetchCache(servicesJSONPath, 24 * 60);
+      setServicesData(svcs);
+      setOppositeIndex(buildOppositeIndex(stops, svcs));
+    } catch (e) {
+      console.error(e); // feature just stays hidden
+    }
   }, []);
 
   useEffect(() => {
@@ -305,22 +320,20 @@ function ArrivalTimes() {
 
   return (
     <div>
-      <div id="bus-stop-map">
-        <img
-          src={`https://busroutersg-staticmaps.cheeaun.workers.dev/${lng},${lat},17,0,60/400x200@2x`}
-          alt="Bus stop map"
-          width="400"
-          height="200"
-          intrinsicsize="400x200"
-          loading="lazy"
-        />
-      </div>
+      {/* Static map image removed in this fork: it was served through the
+          original author's Mapbox-backed worker. Link to our own map instead. */}
       <h1>
         {t('arrivals.preHeading')}
         <b id="bus-stop-name">
           <span class={`stop-tag ${fetchServicesStatus}`}>{code}</span> {name}
         </b>
       </h1>
+      <OtherSide
+        stops={stopsData}
+        services={servicesData}
+        oppositeIndex={oppositeIndex}
+        code={code}
+      />
       <table>
         {services ? (
           services.length ? (

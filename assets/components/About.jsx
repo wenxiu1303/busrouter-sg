@@ -43,7 +43,7 @@ export default function About() {
               Built
             </a>
             &
-            <a href="/visualization/" target="_blank" rel="noopener">
+            <a href="visualization/" target="_blank" rel="noopener">
               visualized
             </a>
             by

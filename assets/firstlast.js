@@ -345,7 +345,7 @@ function FirstLastTimes() {
                 {!!data.length && (
                   <>{t('glossary.nServices', { count: data.length })} · </>
                 )}
-                <a href="/">{t('app.name')}</a>
+                <a href="../">{t('app.name')}</a>
               </p>
               <p>
                 <LocaleSelector />
